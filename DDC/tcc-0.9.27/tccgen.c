@@ -2048,7 +2048,7 @@ static void gen_opif(int op)
         case '-': f1 -= f2; break;
         case '*': f1 *= f2; break;
         case '/': 
-            if (f2 == 0.0) {
+            if (f2 == (f1-f1) ) {
                 if (const_wanted)
                     tcc_error("division by zero in constant");
                 goto general_case;
@@ -6568,7 +6568,7 @@ static void init_putv(CType *type, Section *sec, unsigned long c)
                 else if (sizeof (long double) == sizeof (double))
                     __asm__("fldl %1\nfstpt %0\n" : "=m" (*ptr) : "m" (vtop->c.ld));
 #endif
-                else if (vtop->c.ld == 0.0)
+                else if (vtop->c.ld == (f1-f1) )
                     ;
                 else
 #endif

@@ -349,7 +349,7 @@ static int asm_parse_reg(unsigned int *type)
 static void parse_operand(TCCState *s1, Operand *op)
 {
     ExprValue e;
-    int reg, indir;
+    int reg, indir; int8_t tmp8;
     const char *p;
 
     indir = 0;
@@ -417,7 +417,7 @@ static void parse_operand(TCCState *s1, Operand *op)
         if (!op->e.sym) {
             if (op->e.v == (uint8_t)op->e.v)
                 op->type |= OP_IM8;
-            if (op->e.v == (int8_t)op->e.v)
+            if (tmp8 = op->e.v, op->e.v == tmp8)
                 op->type |= OP_IM8S;
             if (op->e.v == (uint16_t)op->e.v)
                 op->type |= OP_IM16;
@@ -519,7 +519,7 @@ static void gen_disp32(ExprValue *pe)
 /* generate the modrm operand */
 static inline int asm_modrm(int reg, Operand *op)
 {
-    int mod, reg1, reg2, sib_reg1;
+    int mod, reg1, reg2, sib_reg1; int8_t tmp8;
 
     if (op->type & (OP_REG | OP_MMX | OP_SSE)) {
         g(0xc0 + (reg << 3) + op->reg);
@@ -547,7 +547,7 @@ static inline int asm_modrm(int reg, Operand *op)
             mod = 0x00;
         } else if (op->e.v == 0 && !op->e.sym && op->reg != 5) {
             mod = 0x00;
-        } else if (op->e.v == (int8_t)op->e.v && !op->e.sym) {
+        } else if (tmp8 = op->e.v, op->e.v == tmp8 && !op->e.sym) {
             mod = 0x40;
         } else {
             mod = 0x80;
@@ -679,7 +679,7 @@ static void maybe_print_stats (void)
 ST_FUNC void asm_opcode(TCCState *s1, int opcode)
 {
     const ASMInstr *pa;
-    int i, modrm_index, modreg_index, reg, v, op1, seg_prefix, pc;
+    int i, modrm_index, modreg_index, reg, v, op1, seg_prefix, pc; int8_t tmp8;
     int nb_ops, s;
     Operand ops[MAX_OPERANDS], *pop;
     int op_type[3]; /* decoded op type */
@@ -1036,7 +1036,7 @@ again:
         if (!esym || esym->st_shndx != cur_text_section->sh_num)
             goto no_short_jump;
         jmp_disp = ops[0].e.v + esym->st_value - ind - 2 - (v >= 0xff);
-        if (jmp_disp == (int8_t)jmp_disp) {
+        if (tmp8=jmp_disp, jmp_disp == tmp8) {
             /* OK to generate jump */
 	    ops[0].e.sym = 0;
             ops[0].e.v = jmp_disp;
